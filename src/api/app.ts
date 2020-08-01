@@ -1,6 +1,7 @@
 import express, { Application, Router, RequestHandler } from "express";
 import router from "./routes";
 import middlewares from "./middlewares";
+import { databaseSetup } from "./database/config";
 
 interface AppInit {
   router: Router;
@@ -14,6 +15,7 @@ class AppController {
 
     this.middlewares(middlewares || []);
     this.routes(router);
+    databaseSetup();
   }
 
   middlewares(middlewares: Array<RequestHandler>): void {
