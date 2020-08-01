@@ -1,14 +1,18 @@
 import { Request, Response } from "express";
-import UserDTO from "../dtos/UserDTO";
 import UserDAO from "../persistence/UserDAO";
-import JwtDTO from "../dtos/JwtDTO";
 import AuthService from "../services/AuthService";
+
+import JwtDTO from "../dtos/JwtDTO";
+import UserDTO from "../dtos/UserDTO";
+import LoginUserDTO from "../dtos/LoginUserDTO";
+import RegisterUserDTO from "../dtos/RegisterUserDTO";
+import AuthenticationError from "../errors/AuthenticationError";
 
 export default {
   async create(req: Request, res: Response) {
     try {
-      let userDTO: UserDTO = <UserDTO>req.body;
-      return res.status(201).json(await UserDAO.create(userDTO));
+      let registerUserDTO = new RegisterUserDTO(req.body);
+      return res.status(201).json(await UserDAO.create(registerUserDTO));
     } catch (error) {
       return res.status(400).json({ errors: error.errors });
     }
@@ -16,14 +20,15 @@ export default {
 
   async login(req: Request, res: Response) {
     try {
-      let userDTO: UserDTO = <UserDTO>req.body;
+      const loginUserDTO = new LoginUserDTO(req.body);
       const auth = new AuthService();
-      const jwt: JwtDTO = {
-        token: await auth.authenticateUser(userDTO.username, userDTO.password),
-      };
-      return res.status(200).json(jwt);
+
+      const token = await auth.authenticateUser(loginUserDTO);
+      return res.status(200).json(new JwtDTO(token));
     } catch (error) {
-      return res.status(403).json(error.errors);
+      if (error instanceof AuthenticationError)
+        return res.status(403).json(error.errors);
+      return res.status(500).send("Server error");
     }
   },
 };

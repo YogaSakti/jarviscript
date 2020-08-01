@@ -1,16 +1,15 @@
-import UserDTO from "../dtos/UserDTO";
+import RegisterUserDTO from "../dtos/RegisterUserDTO";
 import User from "../models/User";
+import UserDTO from "../dtos/UserDTO";
 import ValidationError from "../errors/ValidationError";
 import { Error } from "mongoose";
 
 export default {
-  async create(userDTO: UserDTO) {
+  async create(registerUserDTO: RegisterUserDTO) {
     try {
-      const user = new User(userDTO);
+      const user = new User(registerUserDTO);
       await user.save();
-      let newUser = { ...user.toObject() };
-      delete newUser.password;
-      return newUser;
+      return new UserDTO(user);
     } catch (error) {
       if (
         error instanceof Error.ValidationError ||

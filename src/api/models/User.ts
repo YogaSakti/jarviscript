@@ -1,7 +1,16 @@
-import mongoose, { Schema } from "mongoose";
-import UserDTO from "../dtos/UserDTO";
+import mongoose, { Schema, Document } from "mongoose";
 import bcrypt from "bcrypt";
 const jwt = require("jsonwebtoken");
+
+interface IUser extends Document {
+  name: string;
+  username: string;
+  email: string;
+  whatsapp: string;
+  password: string;
+  createAccessToken(): string;
+  comparePassword(password: string): Promise<boolean>;
+}
 
 const UserSchema: Schema = new Schema({
   name: {
@@ -48,7 +57,7 @@ UserSchema.pre("save", function (next) {
   });
 });
 
-UserSchema.methods.createAccessToken = function (this: UserDTO) {
+UserSchema.methods.createAccessToken = function (this: IUser) {
   const token = jwt.sign(this.toJSON(), process.env.JWT_SECRET);
   return token;
 };
@@ -66,4 +75,4 @@ UserSchema.methods.comparePassword = function (
   });
 };
 
-export default mongoose.model<UserDTO>("User", UserSchema);
+export default mongoose.model<IUser>("User", UserSchema);

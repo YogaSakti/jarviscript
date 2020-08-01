@@ -1,3 +1,6 @@
-export default interface JwtDTO {
-  token: string;
+export default class JwtDTO {
+  public token: string;
+  constructor(token: string) {
+    this.token = token;
+  }
 }
