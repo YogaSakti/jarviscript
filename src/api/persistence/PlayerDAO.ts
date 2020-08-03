@@ -28,8 +28,6 @@ export default {
         youtube_url: song.youtube_url,
         stream_url: song.stream_url,
       });
-      console.log(songObj);
-      console.log(song);
       player.songs.push(songObj);
     });
     await player.save();

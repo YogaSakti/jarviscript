@@ -1,6 +1,6 @@
 import ServiceFetcher, { IServiceFetcher } from "../ServiceFetcher";
 import SongDTO from "../../../../dtos/Player/SongDTO";
-import ytdl from "../../utils/YoutubeDL";
+import ytdl from "../../utils/youtubedl";
 
 class YoutubeFecther extends ServiceFetcher {
   public query: string;
