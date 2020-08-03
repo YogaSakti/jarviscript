@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 import bcrypt from "bcrypt";
 const jwt = require("jsonwebtoken");
 
-interface IUser extends Document {
+export interface IUser extends Document {
   name: string;
   username: string;
   email: string;
