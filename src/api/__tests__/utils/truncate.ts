@@ -1,7 +1,8 @@
-// import { databaseSetup } from "../../database/config";
 import User from "../../models/User";
+import Player from "../../models/music/Player";
+import Playlist from "../../models/music/Playlist";
 export default async () => {
-  // let mongo = await databaseSetup();
   await User.deleteMany({});
-  // mongo.disconnect();
+  await Player.deleteMany({});
+  await Playlist.deleteMany({});
 };
