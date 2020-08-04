@@ -2,6 +2,7 @@ import express, { Application, Router, RequestHandler } from "express";
 import router from "./routes";
 import middlewares from "./middlewares";
 import { databaseSetup } from "./database/config";
+import MPV from "./services/PlayerService/MPV";
 
 interface AppInit {
   router: Router;
@@ -9,9 +10,13 @@ interface AppInit {
 }
 
 class AppController {
-  public express: Application;
+  public app: Application;
+  public MPV: MPV;
+  public socket: any;
+
   constructor({ router, middlewares }: AppInit) {
-    this.express = express();
+    this.app = express();
+    this.MPV = new MPV();
 
     this.middlewares(middlewares || []);
     this.routes(router);
@@ -19,21 +24,22 @@ class AppController {
   }
 
   middlewares(middlewares: Array<RequestHandler>): void {
-    middlewares.forEach((middleware) => this.express.use(middleware));
+    middlewares.forEach((middleware) => this.app.use(middleware));
   }
 
   routes(router: Router): void {
-    this.express.use(router);
+    this.app.use(router);
   }
 }
 
-const expressApp = (): Application => {
+const expressApp = (): AppController => {
   const appInit: AppInit = {
     router,
     middlewares,
   };
-  const app: AppController = new AppController(appInit);
-  return app.express;
+  const appController: AppController = new AppController(appInit);
+
+  return appController;
 };
 
 export default expressApp();
