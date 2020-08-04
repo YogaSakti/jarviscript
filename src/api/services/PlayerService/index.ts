@@ -7,8 +7,8 @@ import SongDTO from "../../dtos/Player/SongDTO";
 import PlayerDTO from "../../dtos/Player/PlayerDTO";
 import { IPlayer } from "../../models/music/Player";
 
-const mpvAPI = require("node-mpv");
-const mpv = new mpvAPI(config);
+import appController from "../../app";
+import MPV from "./MPV";
 
 export default {
   async append({ query }: PlayerAppendDTO): Promise<PlayerDTO> {
@@ -18,12 +18,19 @@ export default {
   },
 
   async play(): Promise<SongDTO> {
+    const globalMPV: MPV = appController["MPV"];
+
     const player: IPlayer = await playerDAO.getOrCreatePlayer();
     const index = player.current_index;
     const song = player.songs[index];
-    const youtube_url = song.stream_url;
-    await mpv.start();
-    await mpv.load(youtube_url);
+    const youtube_url = song.youtube_url;
+
+    try {
+      await globalMPV.replaceSong(youtube_url || "");
+    } catch (error) {
+      console.log(error);
+    }
+
     return song;
   },
 };
