@@ -17,7 +17,20 @@ export default class MPV {
     this.mpv = mpv;
   }
 
-  public async replaceSong(uri: string): Promise<MPV> {
+  public async play(uri: string) {
+    try {
+      const filename = await this.mpv.getProperty("filename");
+      if (filename) return this.mpv.play();
+    } catch (error) {
+      return this.replaceSongAndPlay(uri);
+    }
+  }
+
+  public async pause() {
+    return this.mpv.pause();
+  }
+
+  public async replaceSongAndPlay(uri: string): Promise<MPV> {
     try {
       await this.mpv.load(uri, "replace");
       await this.mpv.play();
@@ -31,7 +44,13 @@ export default class MPV {
     return await this.mpv.isRunning();
   }
 
-  public async sameAsCurrent(filename: string = "nonexiste") {
-    return (await this.mpv.getFilename()) == filename;
+  public async sameAsCurrent(filename: string | Array<string | undefined>) {
+    const current = await this.mpv.getFilename();
+    if (filename instanceof Array) return filename.includes(current);
+    return current == filename;
+  }
+
+  public async checkPlaying() {
+    return !this.mpv.getProperty("core-idle");
   }
 }
