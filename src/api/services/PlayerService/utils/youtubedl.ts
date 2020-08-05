@@ -1,35 +1,48 @@
 import { exec } from "child_process";
 import YotubueDlError from "./YoutubeDlError";
 
-interface IYoutubeResult {
-  id: string;
-  title: string;
-  video_stream_url?: string;
-  audio_stream_url?: string;
-  thumbnail?: string;
-}
+export class YoutubeResult {
+  public playlistName?: string;
+  public results: Array<YoutubeSingleResult>;
 
-class YoutubeResult {
-  public id: string;
-  public title: string;
-  public video_stream_url?: string;
-  public audio_stream_url?: string;
-  public thumbnail?: string;
+  constructor(
+    results: YoutubeSingleResult | Array<YoutubeSingleResult>,
+    playlistName?: string
+  ) {
+    if (results instanceof YoutubeSingleResult) this.results = [results];
+    else this.results = results;
 
-  constructor(iYoutubeResult: IYoutubeResult) {
-    this.id = iYoutubeResult.id;
-    this.title = iYoutubeResult.title;
-    this.video_stream_url = iYoutubeResult.video_stream_url;
-    this.audio_stream_url = iYoutubeResult.audio_stream_url;
-    this.thumbnail = iYoutubeResult.thumbnail;
+    this.playlistName = playlistName;
   }
 }
 
-function getBests(resultParsed: any): YoutubeResult {
-  const youtubeResult = new YoutubeResult({
-    id: resultParsed.id,
-    title: resultParsed.title,
-  });
+interface IYoutubeSingleResult {
+  id: string;
+  title: string;
+  video_stream_url: string;
+  audio_stream_url: string;
+  thumbnail?: string;
+}
+
+class YoutubeSingleResult {
+  public id: string;
+  public title: string;
+  public video_stream_url: string;
+  public audio_stream_url: string;
+  public thumbnail?: string;
+
+  constructor(iYoutubeSingleResult: IYoutubeSingleResult) {
+    this.id = iYoutubeSingleResult.id;
+    this.title = iYoutubeSingleResult.title;
+    this.video_stream_url = iYoutubeSingleResult.video_stream_url;
+    this.audio_stream_url = iYoutubeSingleResult.audio_stream_url;
+    this.thumbnail = iYoutubeSingleResult.thumbnail;
+  }
+}
+
+function getBests(resultParsed: any): YoutubeSingleResult {
+  let video_stream_url: string = "";
+  let audio_stream_url: string = "";
 
   resultParsed.requested_formats.forEach((requested: any) => {
     switch (requested.format_id) {
@@ -38,12 +51,19 @@ function getBests(resultParsed: any): YoutubeResult {
       case 171:
       case 140:
       case 251:
-        youtubeResult.video_stream_url = requested.url;
+        video_stream_url = requested.url;
         break;
       default:
-        youtubeResult.audio_stream_url = requested.url;
+        audio_stream_url = requested.url;
         break;
     }
+  });
+
+  const youtubeSingleResult = new YoutubeSingleResult({
+    id: resultParsed.id,
+    title: resultParsed.title,
+    video_stream_url,
+    audio_stream_url,
   });
 
   const thumbnails: Array<any> = resultParsed.thumbnails;
@@ -54,13 +74,13 @@ function getBests(resultParsed: any): YoutubeResult {
     return resB - resA;
   });
 
-  youtubeResult.thumbnail = thumbnails[0].url;
+  youtubeSingleResult.thumbnail = thumbnails[0].url;
 
-  return youtubeResult;
+  return youtubeSingleResult;
 }
 
 export default {
-  async getInfoFromUrl(url: string): Promise<Array<YoutubeResult>> {
+  async getInfoFromUrl(url: string): Promise<YoutubeResult> {
     try {
       const result: string = await new Promise((resolve, reject) => {
         exec(
@@ -75,17 +95,16 @@ export default {
 
       const parsed: any = JSON.parse(result);
       const type: string = parsed._type;
-
       if (type === "playlist") {
-        const ytPlaylistResult: Array<YoutubeResult> = [];
+        const ytPlaylistResult: Array<YoutubeSingleResult> = [];
 
         parsed.entries.forEach((entry: any) =>
-          ytPlaylistResult.push(new YoutubeResult(entry))
+          ytPlaylistResult.push(new YoutubeSingleResult(entry))
         );
 
-        return ytPlaylistResult;
+        return new YoutubeResult(ytPlaylistResult, parsed.title);
       } else {
-        return [getBests(parsed)];
+        return new YoutubeResult(getBests(parsed));
       }
     } catch (error) {
       throw new YotubueDlError(error);
