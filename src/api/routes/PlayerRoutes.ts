@@ -4,5 +4,6 @@ const router = Router();
 
 router.post("/append", PlayerController.append);
 router.get("/play", PlayerController.play);
+router.get("/next", PlayerController.next);
 
 export default router;

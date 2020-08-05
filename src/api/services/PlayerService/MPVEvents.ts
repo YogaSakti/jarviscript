@@ -1,3 +1,5 @@
+import playerService from ".";
+
 interface IEventStatus {
   property: string;
   value: any;
@@ -22,7 +24,7 @@ const defaultEvents: Array<string> = [
 
 const events: IEvent<Function> = {
   "eof-reached": (value: any) => {
-    console.log("eof:", value);
+    if (value) playerService.next();
   },
   pause: (value: any) => {
     console.log("pause", value);

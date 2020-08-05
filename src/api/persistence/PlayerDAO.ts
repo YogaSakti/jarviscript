@@ -2,6 +2,16 @@ import SongDTO from "../dtos/Player/SongDTO";
 import Player, { IPlayer } from "../models/music/Player";
 import Song from "../models/music/Song";
 
+export class PlayerDAOError extends Error {
+  public message: string;
+  public error: string;
+  constructor(message: string, error: string) {
+    super();
+    this.message = message;
+    this.error = error;
+  }
+}
+
 export default {
   async getOrCreatePlayer(): Promise<IPlayer> {
     const player = await Player.find({});
@@ -32,5 +42,18 @@ export default {
     });
     await player.save();
     return player;
+  },
+
+  async next(): Promise<IPlayer> {
+    const player = await this.getOrCreatePlayer();
+    const qtd_songs = player.songs.length;
+
+    if (player.current_index < qtd_songs - 1) {
+      player.save();
+      player.current_index++;
+      return player;
+    } else {
+      throw new PlayerDAOError("Out of bounds.", "out_of_bounds");
+    }
   },
 };

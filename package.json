@@ -19,6 +19,7 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
+    "@open-wa/wa-automate": "^1.9.105",
     "@types/mongoose": "^5.7.34",
     "@types/youtube-dl": "^1.12.2",
     "bcrypt": "^5.0.0",

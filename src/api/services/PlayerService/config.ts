@@ -1,5 +1,5 @@
 export default {
-  audio_only: false, //default: false
+  audio_only: true, //default: false
   // auto_restart: true, //default: true
   // binary: null, //default: null
   debug: true, //default: false

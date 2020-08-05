@@ -32,10 +32,18 @@ function getBests(resultParsed: any): YoutubeResult {
   });
 
   resultParsed.requested_formats.forEach((requested: any) => {
-    if (requested.format_note == "DASH video")
-      youtubeResult.video_stream_url = requested.fragment_base_url;
-    else if (requested.format_note == "DASH audio")
-      youtubeResult.audio_stream_url = requested.fragment_base_url;
+    switch (requested.format_id) {
+      case 249:
+      case 250:
+      case 171:
+      case 140:
+      case 251:
+        youtubeResult.video_stream_url = requested.url;
+        break;
+      default:
+        youtubeResult.audio_stream_url = requested.url;
+        break;
+    }
   });
 
   const thumbnails: Array<any> = resultParsed.thumbnails;

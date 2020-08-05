@@ -1,5 +1,5 @@
 import config from "./config";
-import MPVError from "./MpvError";
+import MPVError from "./MPVError";
 const mpvAPI = require("node-mpv");
 import { registerEvents } from "./MPVEvents";
 
@@ -29,5 +29,9 @@ export default class MPV {
 
   public async isRunning(): Promise<boolean> {
     return await this.mpv.isRunning();
+  }
+
+  public async sameAsCurrent(filename: string = "nonexiste") {
+    return (await this.mpv.getFilename()) == filename;
   }
 }
