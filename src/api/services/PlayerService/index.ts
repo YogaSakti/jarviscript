@@ -25,6 +25,10 @@ export class PlayerServiceError extends Error {
 }
 
 export default {
+  async current(): Promise<IPlayer> {
+    return await playerDAO.getOrCreatePlayer();
+  },
+
   async append({ query }: PlayerAppendDTO): Promise<ServiceFetcherDTO> {
     const result: ServiceFetcherDTO = await queryFetch(query);
     await playerDAO.appendToPlayerPlaylist(result.songs);
