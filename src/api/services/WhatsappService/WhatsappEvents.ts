@@ -11,12 +11,12 @@ const events: IEvent<Function> = {
   onAck: (message: Message) => {},
   onAddedToGroup: (chat: Chat) => {},
   onAnyMessage: async (message: Message) => {
-    let msg: string = message.body;
+    let msg: string = message.body.toLowerCase();
     console.log("message_recived: ", msg);
 
-    let returnMsg: string;
+    let returnMsg: string = "";
 
-    if (msg == "skip") {
+    if (msg == "next") {
       try {
         let song = await playerService.next();
         returnMsg = `Skiped, playing now: *${song.title}*`;
@@ -44,10 +44,19 @@ const events: IEvent<Function> = {
       } catch (error) {
         returnMsg = error.message;
       }
-    } else if (msg == "crear") {
+    } else if (msg == "q") {
       try {
-        await playerService.clear();
-        returnMsg = `Cleared queue`;
+        const current = await playerService.current();
+        const current_index = current.current_index;
+
+        current.songs.forEach((song, index) => {
+          returnMsg += `\n`;
+          if (index == current_index) returnMsg += "\n⤵\n*";
+
+          returnMsg += `${index + 1} - ${song.title}`;
+
+          if (index == current_index) returnMsg += "*\n⤴ Tocando agora\n";
+        });
       } catch (error) {
         returnMsg = error.message;
       }
