@@ -50,7 +50,7 @@ export default {
 
     const newIndex = player.current_index + (isNext ? 1 : -1);
 
-    if (newIndex < qtd_songs - 1 && newIndex >= 0) {
+    if (newIndex < qtd_songs && newIndex >= 0) {
       player.current_index = newIndex;
       await player.save();
       return player;
