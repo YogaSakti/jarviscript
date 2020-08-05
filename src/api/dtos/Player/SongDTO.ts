@@ -1,5 +1,5 @@
 export default interface SongDTO {
-  id?: string;
+  _id?: string;
   title: string;
   artist?: string;
   youtube_url?: string;

@@ -1,8 +1,10 @@
 import ServiceFetcher from "../ServiceFetcher";
 import SongDTO from "../../../../dtos/Player/SongDTO";
 import request from "request";
+import ServiceFetcherDTO from "../../../../dtos/Player/ServiceFetcherDTO";
 
 class SearchFetcher extends ServiceFetcher {
+  public serviceName: string = "Youtube Search";
   public query: string;
   public songs: SongDTO[];
 
@@ -16,13 +18,9 @@ class SearchFetcher extends ServiceFetcher {
     return true;
   }
 
-  async fetch(): Promise<SongDTO[]> {
+  async fetch(): Promise<ServiceFetcherDTO> {
     await request.get(this.query);
-    return [
-      {
-        title: "teste",
-      },
-    ];
+    throw new Error("Method not implemented.");
   }
 }
 

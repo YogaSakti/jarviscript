@@ -14,9 +14,9 @@ export class PlayerDAOError extends Error {
 
 export default {
   async getOrCreatePlayer(): Promise<IPlayer> {
-    const player = await Player.find({});
+    const player = await Player.findOne({});
 
-    if (player.length == 0) {
+    if (!player) {
       const player = new Player({
         is_playing: false,
         is_stopped: true,
@@ -26,7 +26,7 @@ export default {
       });
       await player.save();
       return player;
-    } else return player[0];
+    } else return player;
   },
 
   async appendToPlayerPlaylist(songs: Array<SongDTO>): Promise<IPlayer> {
@@ -44,16 +44,29 @@ export default {
     return player;
   },
 
-  async next(): Promise<IPlayer> {
+  async nextPrev(isNext: boolean): Promise<IPlayer> {
     const player = await this.getOrCreatePlayer();
     const qtd_songs = player.songs.length;
 
-    if (player.current_index < qtd_songs - 1) {
-      player.save();
-      player.current_index++;
+    const newIndex = player.current_index + (isNext ? 1 : -1);
+
+    if (newIndex < qtd_songs - 1 && newIndex >= 0) {
+      player.current_index = newIndex;
+      await player.save();
       return player;
     } else {
       throw new PlayerDAOError("Out of bounds.", "out_of_bounds");
     }
+  },
+
+  async updateStreamUrl(songDTO: SongDTO, newStreamUrl: string) {
+    const player = await this.getOrCreatePlayer();
+    player.songs.forEach((song) => {
+      if (String(song._id) == songDTO._id) {
+        song.stream_url = newStreamUrl;
+        // song.save();
+      }
+    });
+    return player.save();
   },
 };

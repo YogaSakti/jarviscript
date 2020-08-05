@@ -1,7 +1,9 @@
 import ServiceFetcher from "../ServiceFetcher";
 import SongDTO from "../../../../dtos/Player/SongDTO";
+import ServiceFetcherDTO from "../../../../dtos/Player/ServiceFetcherDTO";
 
 class SpotifyFetcher extends ServiceFetcher {
+  public serviceName: string = "Spotify";
   public query: string;
   public songs: SongDTO[];
 
@@ -15,7 +17,7 @@ class SpotifyFetcher extends ServiceFetcher {
     return false;
     // throw new Error("Method not implemented.");
   }
-  fetch(): Promise<SongDTO[]> {
+  fetch(): Promise<ServiceFetcherDTO> {
     throw new Error("Method not implemented.");
   }
 }
